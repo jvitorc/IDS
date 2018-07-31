@@ -210,14 +210,10 @@ bool packet_monitor::callback(const Tins::PDU& pdu) {
     auto tcp = ip.find_pdu<Tins::TCP>();
     auto icmp = ip.find_pdu<Tins::ICMP>();
     auto udp = ip.find_pdu<Tins::UDP>();
-    
-    std::cout << "Pacote: ";
 
     if(tcp) {
-        std::cout << " TCP |";
         auto it = tcp_block.find(address);
         if (tcp->get_flag(Tins::TCP::ACK)) {
-            std::cout << " ACK ";
             if (it != tcp_block.end()) {
                 std::lock_guard<std::mutex> lock(m_tcp);
                 it->second--;
@@ -227,7 +223,6 @@ bool packet_monitor::callback(const Tins::PDU& pdu) {
                 } 
             }
         } else if (tcp->get_flag(Tins::TCP::SYN)) {
-            std::cout << " SYN ";
             std::lock_guard<std::mutex> lock(m_tcp);
             open_sessions++;
 
@@ -256,7 +251,6 @@ bool packet_monitor::callback(const Tins::PDU& pdu) {
             }            
         }
     } else if (icmp) {
-        std::cout << "ICMP";
         if (icmp->type() == Tins::ICMP::ECHO_REQUEST) {
             std::lock_guard<std::mutex> lock1(m_icmp);
             auto it = icmp_block.find(address);
@@ -286,7 +280,6 @@ bool packet_monitor::callback(const Tins::PDU& pdu) {
             }
         }        
     } else if(udp) {
-        std::cout << "UDP";
         std::lock_guard<std::mutex> lock1(m_udp);
         auto it = udp_block.find(address);
         udp_packeges++;
@@ -321,7 +314,6 @@ bool packet_monitor::callback(const Tins::PDU& pdu) {
             udp_block.insert({address,1});
         }
     }
-    std::cout << std::endl;
     return execute;
 }
 
