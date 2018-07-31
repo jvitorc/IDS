@@ -126,7 +126,6 @@ void packet_monitor::restart() {
             fclose(file);
         }
 
-        delete[] aux_blacklist;
         std::cout << "Restart\n";
     }
 }
