@@ -93,39 +93,41 @@ void packet_monitor::restart() {
             udp_block.clear();
             udp_packeges = 0;
         }
-     
+ 
         int systemRet;
         do {
             systemRet = system("iptables -F");
         } while(systemRet == -1);
-     
-        time_t rawtime;
-        struct tm * timeinfo;
-        time ( &rawtime );
-        timeinfo = localtime ( &rawtime );
 
-        // Nome do arquivo a ser salvo: YYYY-MM-DD_HH:MM:SS.log 
-        //                          EX: 2018-05-19-14:27:34.log
-        char filename[30];
-        strftime(filename, 30, "log/%F-%T.log", timeinfo);
+        if (aux_blacklist->size() > 0) {     
+            time_t rawtime;
+            struct tm * timeinfo;
+            time ( &rawtime );
+            timeinfo = localtime ( &rawtime );
 
-        // Registros da blacklist
-        std::string text = asctime(timeinfo);
-        text += "\n\t\tBLACKLIST - " + std::to_string(aux_blacklist->size());         
+            // Nome do arquivo a ser salvo: YYYY-MM-DD_HH:MM:SS.log 
+            //                          EX: 2018-05-19-14:27:34.log
+            char filename[30];
+            strftime(filename, 30, "log/%F-%T.log", timeinfo);
 
-        for(auto it: *aux_blacklist) {
-            text += "\n";
-            text += it.c_str();
+            // Registros da blacklist
+            std::string text = asctime(timeinfo);
+            text += "\n\t\tBLACKLIST - " + std::to_string(aux_blacklist->size());         
+
+            for(auto it: *aux_blacklist) {
+                text += "\n";
+                text += it.c_str();
+            }
+
+            // Salvar no arquivo
+            FILE *file;
+            file = fopen(filename, "w");
+            if (file) {
+                fputs(text.c_str(), file);
+                fclose(file);
+            }
         }
-
-        // Salvar no arquivo
-        FILE *file;
-        file = fopen(filename, "w");
-        if (file) {
-            fputs(text.c_str(), file);
-            fclose(file);
-        }
-
+        delete aux_blacklist;
         std::cout << "Restart\n";
     }
 }
