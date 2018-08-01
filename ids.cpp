@@ -170,7 +170,7 @@ void packet_monitor::sendFirewall(const std::string& address) {
     do {
         systemRet = system(command.c_str());
     } while(systemRet == -1);                
-
+    std::cout << "IP BLOQUEADO: " << address << std::endl;
 }
 
 
@@ -198,13 +198,13 @@ bool packet_monitor::callback(const Tins::PDU& pdu) {
     auto ip = pdu.rfind_pdu<Tins::IP>();
     auto address = ip.src_addr().to_string();
     
-    // // Sessao critica (a ser testada)
-    // {
-    //     std::lock_guard<std::mutex> lock(m_blacklist);
-    //     if (std::find(blacklist->begin(), blacklist->end(), address) != blacklist->end()) {
-    //         return execute;
-    //     }
-    // }
+    // Sessao critica
+    {
+        std::lock_guard<std::mutex> lock(m_blacklist);
+        if (std::find(blacklist->begin(), blacklist->end(), address) != blacklist->end()) {
+            return execute;
+        }
+    }
     
     auto tcp = ip.find_pdu<Tins::TCP>();
     auto icmp = ip.find_pdu<Tins::ICMP>();
