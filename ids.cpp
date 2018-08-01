@@ -128,7 +128,6 @@ void packet_monitor::restart() {
             }
         }
         delete aux_blacklist;
-        std::cout << "Restart\n";
     }
 }
 
@@ -138,8 +137,6 @@ void packet_monitor::reset_tcp() {
         std::lock_guard<std::mutex> lock(m_tcp);
         tcp_block.clear();
         open_sessions = 0;        
-
-        std::cout << "reset_tcp\n";
     }
 }
 
@@ -149,8 +146,6 @@ void packet_monitor::reset_icmp() {
         std::lock_guard<std::mutex> lock(m_icmp);
         icmp_block.clear();
         echo_request = 0;        
-
-        std::cout << "reset_icmp\n";
     }
 }
 
@@ -160,8 +155,6 @@ void packet_monitor::reset_udp() {
         std::lock_guard<std::mutex> lock(m_udp);
         udp_block.clear();
         udp_packeges = 0;        
-
-        std::cout << "reset_udp\n";
     }
 
 }
@@ -172,7 +165,6 @@ void packet_monitor::sendFirewall(const std::string& address) {
     do {
         systemRet = system(command.c_str());
     } while(systemRet == -1);                
-    std::cout << "IP BLOQUEADO: " << address << std::endl;
 }
 
 
